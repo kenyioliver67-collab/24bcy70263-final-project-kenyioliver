@@ -1,13 +1,15 @@
 import { db } from '@/lib/db'
 import { NextResponse } from 'next/server'
 
-export async function GET() {
-  const todos = await db.todo.findMany({ orderBy: { createdAt: 'desc' } })
-  return NextResponse.json(todos)
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const { done } = await req.json()
+  const todo = await db.todo.update({ where: { id }, data: { done } })
+  return NextResponse.json(todo)
 }
 
-export async function POST(req: Request) {
-  const { text } = await req.json()
-  const todo = await db.todo.create({ data: { text } })
-  return NextResponse.json(todo)
+export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  await db.todo.delete({ where: { id } })
+  return NextResponse.json({ success: true })
 }
